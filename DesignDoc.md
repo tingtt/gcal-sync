@@ -17,7 +17,7 @@
 gcal-sync login
 
 # Sync events to personal (or specified) calendar
-gcal-sync <src calendar id> [--dest <dest calendar id>] [--name <sync event name>] [--all] [--month YYYYMM] [--next-month]
+gcal-sync <src calendar id> [--dest <dest calendar id>] [--name <search string>] [--month YYYYMM] [--next-month] [--prefix <prefix>] [--color <color>]
 ```
 
 ### Sync Input
@@ -26,10 +26,11 @@ gcal-sync <src calendar id> [--dest <dest calendar id>] [--name <sync event name
 | --- | --- | --- |
 | src calendar id | 必須 | 同期元の Google Calendar ID |
 | `--dest` / `-d` | 任意 | 同期先のカレンダー ID<br/>未指定の場合はプライマリカレンダー |
-| `--name` | 任意 | 同期対象の予定名（完全一致）<br/>未指定の場合はすべての予定が対象になるため警告を表示し、y/n をプロンプトで確認する |
-| `--all` | 任意 | 一致する予定をすべて同期する<br/>未指定の場合は当日以降で開始予定が最も近い 1 件のみ同期する |
-| `--month` | 任意 | 同期範囲を特定の月に絞る（YYYYMM 形式）<br/>未指定の場合は範囲制限なし |
+| `--name` | 任意 | 同期対象の絞り込み文字列（Google Calendar の全文検索で使用）<br/>未指定の場合はすべての予定が対象 |
+| `--month` | 任意 | 同期範囲を特定の月に絞る（YYYYMM 形式）<br/>指定した月に一致するすべてのイベントを対象とする |
 | `--next-month` | 任意 | `--month` に翌月を指定する省略形 |
+| `--prefix` | 任意 | 作成するイベントのタイトルに付与するプレフィックス |
+| `--color` | 任意 | 作成するイベントの色。数値（1–11）またはカラー名（tomato / flamingo / tangerine / banana / sage / basil / peacock / blueberry / lavender / grape / graphite）で指定 |
 
 ### Sync Result
 
@@ -76,7 +77,7 @@ gcal-sync <src calendar id> [--dest <dest calendar id>] [--name <sync event name
 
 実行単位は CLI とする。ユーザーは `login` で Google OAuth 認証を行い、その後 sync コマンドで同期を実行する。
 
-sync コマンドは `--month` / `--next-month` で対象月を絞ることができ、未指定の場合は制限なし（当日以降）で動作する。`--all` 未指定の場合は当日以降で開始予定が最も近い 1 件のみを同期する。`--name` 未指定の場合はすべての予定が対象になるため警告を表示し y/N で確認を取る。`--name` と `--month` の両方が未指定の場合、および `--month` 未指定かつ `--all` 指定の場合はエラーとして終了する。
+sync コマンドは `--month` / `--next-month` で対象月を指定できる。月を指定した場合はその月に一致するすべてのイベントを対象とする。未指定の場合は当日以降で開始予定が最も近い 1 件のみを同期する。`--name` を指定すると Google Calendar の全文検索で絞り込みを行う。未指定の場合はすべての予定が対象になる。
 
 この機能は、同期元カレンダーを読み取り、条件に合う予定を抽出し、個人カレンダー上のツール管理予定と比較して同期状態を揃える。
 
@@ -102,6 +103,8 @@ Rel(syncTool, targetCalendar, "予定を検索・追加・削除", "Google Calen
 ### Login
 
 `gcal-sync login` を実行すると、ブラウザで Google OAuth 認証フローを開始する。認証完了後、取得したトークンをローカルに保存する。以降の sync コマンドはこのトークンを使って Google Calendar API を呼び出す。
+
+クレデンシャル（`credentials.json`）の配布方法とバイナリへの埋め込み戦略については [docs/DesignDoc_Google_OAuth.md](./DesignDoc_Google_OAuth.md) を参照。
 
 ### Sync Flow
 

@@ -1,0 +1,9 @@
+# Build output
+gcal-sync
+
+# Credentials files
+*.json
+
+# Real credentials — replace internal/auth/credentials.json with yours before
+# building a distributable binary. DO NOT commit the real file.
+# The file internal/auth/credentials.json is intentionally kept as a placeholder ({}).
